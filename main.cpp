@@ -8,6 +8,10 @@
 using namespace std;
 
 /*create this flie*/
+
+
+
+// ok. bla bla bla
 graphType graph;
 struct matrixT
 {
