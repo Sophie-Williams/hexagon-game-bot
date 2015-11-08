@@ -1,31 +1,14 @@
-struct connect
+struct node
 {
-	int idConn = 0;
-	int idNew = 0;
-	int inputConn = 0;
-	int inputNew = 0;
-	bool active = false;
-};
-
-class nodeType
-{
-public:
-	nodeType *input[6];
-	int id;
+	int id=-1;
 	int value;
-	nodeType()
-	{
-		input[0] = NULL;
-		input[1] = NULL;
-		input[2] = NULL;
-		input[3] = NULL;
-		input[4] = NULL;
-		input[5] = NULL;
-	}
+	bool visited = false;
+	struct listNode *next = NULL;
 };
 
-struct graphType
+
+struct listNode
 {
-	nodeType *head;
-	nodeType *tail;
+	node *node = NULL;
+	listNode *next = NULL;
 };
