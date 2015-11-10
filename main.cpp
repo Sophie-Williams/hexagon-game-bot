@@ -1,14 +1,10 @@
-#include "conio.h"
-#include "stdio.h"
-#include "fstream"
-#include "iostream"
 #include "mylib.h"
-#pragma warning(disable:4996)
+//#include "serverTCP.cpp"
 #define CLEAN 0
 #define RED 1
 #define BLUE 2
-using namespace std;
 node hexag[61];
+
 //int visited[61] = { 0 };
 
 void bindNodes(int id, int idHex)
@@ -187,6 +183,8 @@ void main()
 	{
 		printf("%i:\t%i\n",i,hexag[i].value);
 	}
+
+	serverTCP(hexag);
 	printf("\nfinish\n");
 	getch();
 }
