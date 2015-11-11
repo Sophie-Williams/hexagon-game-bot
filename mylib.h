@@ -18,6 +18,13 @@ struct node
 	struct listNode *next = NULL;
 };
 
+class maxClass
+{
+public:
+	int max = 0;
+	int idWho = -1;
+	int idWhere = -1;
+};
 
 struct listNode
 {
@@ -25,5 +32,6 @@ struct listNode
 	listNode *next = NULL;
 };
 
-void serverTCP(node hex[]);
+void serverTCP();
+char *botStart(char map[], int colRed, int colBlue);
 

@@ -3,10 +3,11 @@
 #define CLEAN 0
 #define RED 1
 #define BLUE 2
+
 node hexag[61];
-
 //int visited[61] = { 0 };
-
+int movePoint(int, int);
+int searchRad1(int, int);
 void bindNodes(int id, int idHex)
 {
 	listNode *newList = new listNode;
@@ -24,6 +25,86 @@ void bindNodes(int id, int idHex)
 		}
 		tmpList->next = newList;
 	}
+}
+
+maxClass checkKillPoint(int point[], int col)
+{
+	maxClass maxKill;
+	for (int i = 0; i < col; i++)
+	{
+		int idWho = point[i];
+		int tmp = 0;
+		int tmpMax = 0;
+		listNode *tmpList = hexag[point[i]].next;
+		while (tmpList != NULL)
+		{
+			if (tmpList->node->value == CLEAN)
+			{
+				tmpMax = searchRad1(tmpList->node->id, BLUE);
+				printf("For\tid=%i\tmax=%i\trad1\n", idWho, tmpMax);
+				if (tmpMax >= maxKill.max)
+				{
+					maxKill.idWhere = tmpList->node->id;
+					maxKill.idWho = idWho;
+					maxKill.max = tmpMax;
+				}
+			}
+
+			listNode *tmpList2 = tmpList->node->next;
+			while (tmpList2 != NULL)
+			{
+				if (tmpList2->node->value == CLEAN)
+				{
+					tmpMax = searchRad1(tmpList2->node->id, BLUE)-1;
+					printf("For\tid=%i\tmax=%i\trad2\n", idWho, tmpMax);
+					if (tmpMax > maxKill.max)
+					{
+						maxKill.idWhere = tmpList2->node->id;
+						maxKill.idWho = idWho;
+						maxKill.max = tmpMax;
+					}
+				}
+				tmpList2 = tmpList2->next;
+			}
+			tmpList = tmpList->next;
+		}
+	}
+	return maxKill;
+}
+
+char *botStart(char map[], int colRed, int colBlue)
+{
+	const int MY = RED;
+	const int HIS = BLUE;
+	maxClass max;
+	char *newmap = new char[61];
+	int *redPoint = new int[colRed];
+	int *blPoint = new int[colBlue];
+	//int *myKillPoint = new int[colBlue];
+	int r = 0;
+	int b = 0;
+	for (int i = 0; i < 61; i++)
+	{
+		hexag[i].value = (int)map[i];
+		if (hexag[i].value == RED)
+		{
+			redPoint[r] = hexag[i].id;
+			r++;
+		}
+		else if (hexag[i].value == BLUE)
+		{
+			blPoint[b] = hexag[i].id;
+			b++;
+		}
+	}
+	
+	max = checkKillPoint(redPoint, colRed);
+	movePoint(max.idWho, max.idWhere);
+	for (int i = 0; i < 61; i++)
+	{
+		newmap[i] = hexag[i].value;
+	}
+	return newmap;
 }
 
 void parsingString(int idHex, char str[35])
@@ -103,8 +184,9 @@ bool visited(int id, int visitMass[])
 	return 0;
 }
 
-int move(int who, int where, int color)
+int movePoint(int who, int where)
 {
+	int color = hexag[who].value;
 	int rad = 0;
 	int rad2visited[18] = { 0 };
 	bool repeat = true;
@@ -160,11 +242,9 @@ void main()
 	
 	for (int i = 0; i < 61; i++)
 	{
-		printf("id=%i:\t",hexag[i].id);
 		listNode *tmpList = hexag[i].next;
 		while (tmpList != NULL)
 		{
-			printf("%i\t",tmpList->node->id);
 			tmpList = tmpList->next;
 		}
 		printf("\n");
@@ -177,14 +257,14 @@ void main()
 	hexag[15].value = BLUE;
 
 	printf("\nSumm = %i\n", searchRad1(13, RED));
-	move(15,13, hexag[15].value);
+	movePoint(15,13);
 
 	for (int i = 0; i < 61; i++)
 	{
 		printf("%i:\t%i\n",i,hexag[i].value);
 	}
 
-	serverTCP(hexag);
+	serverTCP();
 	printf("\nfinish\n");
 	getch();
 }
