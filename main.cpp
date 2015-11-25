@@ -1,5 +1,4 @@
 #include "mylib.h"
-//#include "serverTCP.cpp"
 #define CLEAN 0
 #define RED 1
 #define BLUE 2
@@ -94,14 +93,7 @@ char *botStart(char map[], int colRed, int colBlue)
 			pl++;
 		}
 	}
-	
-	printf("was get:\n");
-	for (int i = 0; i < 61; i++) printf("%i", hexag[i][0]);
-	printf("\n");
 	max = checkKillPoint(comPoint, colRed);
-	printf("post checkKill:\n");
-	for (int i = 0; i < 61; i++) printf("%i",hexag[i][0]);
-	printf("\n");
 	movePoint(max.idFrom, max.idTo);
 	for (int i = 0; i < 61; i++)
 	{
@@ -116,7 +108,6 @@ void parsingString(int idNode, char str[35])
 	int c = 0;
 	int idLink = 0;
 	char tmp[3] = "";
-	//hexag[idHex].id = idHex;
 	while (str[i] != '\0')
 	{
 		if (str[i] == ',')
@@ -168,7 +159,6 @@ int searchRad1(int idNode, int color)
 
 void reColor(int idNode, int toColor)
 {
-	printf("remake in:%i\n", toColor);
 	int i = 1;
 	while ((hexag[idNode][i] != -1) && (i<7))
 	{
@@ -176,10 +166,6 @@ void reColor(int idNode, int toColor)
 			hexag[hexag[idNode][i]][0] = toColor;
 		i++;
 	}
-
-	printf("post reColor:\n");
-	for (int i = 0; i < 61; i++) printf("%i", hexag[i][0]);
-	printf("\n");
 }
 
 bool visited(int id, int visitMass[])
@@ -199,13 +185,9 @@ int movePoint(int fromNode, int toNode)
 
 	while ((hexag[fromNode][i] != -1) && (i<7))
 	{
-		//visited[hexag[fromNode][i]] = 1;
 		if (hexag[fromNode][i] == toNode)
 		{
 			hexag[toNode][0] = hexag[fromNode][0];
-			printf("pre reColor:\n");
-			for (int i = 0; i < 61; i++) printf("%i", hexag[i][0]);
-			printf("\n");
 			reColor(toNode, toColor);
 			return 1;
 		}
@@ -221,18 +203,11 @@ int movePoint(int fromNode, int toNode)
 			{
 				hexag[toNode][0] = hexag[fromNode][0];
 				hexag[fromNode][0] = CLEAN;
-				printf("pre reColor:\n");
-				for (int i = 0; i < 61; i++) printf("%i", hexag[i][0]);
-				printf("\n");
 				reColor(toNode, toColor);
 				return 1;
 			}
 		}
 	}
-
-	printf("post move:\n");
-	for (int i = 0; i < 61; i++) printf("%i",hexag[i][0]);
-	printf("\n");
 	return 0;
 }
 
@@ -247,14 +222,6 @@ void main()
 		}
 	}
 	graphCreate();
-
-	printf("\nSumm = %i\n", searchRad1(13, RED));
-	//movePoint(15,13);
-
-	printf("main:\n");
-	for (int i = 0; i < 61; i++) printf("%i",hexag[i][0]);
-	printf("\n");
-
 	serverTCP();
 	printf("\nfinish\n");
 	getch();

@@ -1,4 +1,3 @@
-//check
 #include "winsock2.h"
 #include "conio.h"
 #include "iostream"
@@ -6,18 +5,9 @@
 #include "windows.h"
 #include "fstream"
 #pragma comment(lib,"wsock32.lib")
-#pragma warning(disable:4996)
-
+#pragma warning(disable:4996)			/* for visual studio >=2013 */
 using namespace std;
 
-/*struct node
-{
-	int id=-1;
-	int value;
-	bool visited = false;
-	struct listNode *next = NULL;
-};
-*/
 class maxClass
 {
 public:
@@ -25,13 +15,6 @@ public:
 	int idFrom = -1;
 	int idTo = -1;
 };
-
-/*struct listNode
-{
-	node *node = NULL;
-	listNode *next = NULL;
-};
-*/
 void serverTCP();
 char *botStart(char map[], int colRed, int colBlue);
 
