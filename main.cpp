@@ -4,27 +4,18 @@
 #define RED 1
 #define BLUE 2
 
-node hexag[61];
-//int visited[61] = { 0 };
+int hexag[61][7];
 int movePoint(int, int);
 int searchRad1(int, int);
-void bindNodes(int id, int idHex)
+
+void bindNodes(int idLink, int idNode)
 {
-	listNode *newList = new listNode;
-	newList->node = &hexag[id];
-	listNode *tmpList = hexag[idHex].next;
-	if (tmpList == NULL)
+	int i = 1;
+	while ((hexag[idNode][i] != -1) && (i<7))
 	{
-		hexag[idHex].next = newList;
+		i++;
 	}
-	else
-	{
-		while (tmpList->next != NULL)
-		{
-			tmpList = tmpList->next;
-		}
-		tmpList->next = newList;
-	}
+	hexag[idNode][i] = idLink;
 }
 
 maxClass checkKillPoint(int point[], int col)
@@ -32,41 +23,47 @@ maxClass checkKillPoint(int point[], int col)
 	maxClass maxKill;
 	for (int i = 0; i < col; i++)
 	{
-		int idWho = point[i];
+		int idFrom = point[i];
 		int tmp = 0;
 		int tmpMax = 0;
-		listNode *tmpList = hexag[point[i]].next;
-		while (tmpList != NULL)
+		int j = 1;
+
+		while ((hexag[point[i]][j] != -1) && (j<7))
 		{
-			if (tmpList->node->value == CLEAN)
+			if (hexag[hexag[point[i]][j]][0] == CLEAN)
 			{
-				tmpMax = searchRad1(tmpList->node->id, BLUE);
-				printf("For\tid=%i\tmax=%i\trad1\n", idWho, tmpMax);
+				tmpMax = searchRad1(hexag[point[i]][j], BLUE);
+				printf("For\tid=%i\tmax=%i\trad1\n", idFrom, tmpMax);
 				if (tmpMax >= maxKill.max)
 				{
-					maxKill.idWhere = tmpList->node->id;
-					maxKill.idWho = idWho;
+					maxKill.idTo = hexag[point[i]][j];
+					maxKill.idFrom = idFrom;
 					maxKill.max = tmpMax;
 				}
 			}
+			j++;
+		}
 
-			listNode *tmpList2 = tmpList->node->next;
-			while (tmpList2 != NULL)
+		j = 1;
+		while ((hexag[point[i]][j] != -1) && (j<7))
+		{
+			int c = 1;
+			while ((hexag[hexag[point[i]][j]][c] != -1) && (c<7))
 			{
-				if (tmpList2->node->value == CLEAN)
+				if (hexag[hexag[hexag[point[i]][j]][c]][0] == CLEAN)
 				{
-					tmpMax = searchRad1(tmpList2->node->id, BLUE)-1;
-					printf("For\tid=%i\tmax=%i\trad2\n", idWho, tmpMax);
+					tmpMax = searchRad1(hexag[hexag[point[i]][j]][c], BLUE) - 1;
+					printf("For\tid=%i\tmax=%i\trad1\n", idFrom, tmpMax);
 					if (tmpMax > maxKill.max)
 					{
-						maxKill.idWhere = tmpList2->node->id;
-						maxKill.idWho = idWho;
+						maxKill.idTo = hexag[point[i]][j];
+						maxKill.idFrom = idFrom;
 						maxKill.max = tmpMax;
 					}
 				}
-				tmpList2 = tmpList2->next;
+				c++;
 			}
-			tmpList = tmpList->next;
+			j++;
 		}
 	}
 	return maxKill;
@@ -74,55 +71,61 @@ maxClass checkKillPoint(int point[], int col)
 
 char *botStart(char map[], int colRed, int colBlue)
 {
-	const int MY = RED;
-	const int HIS = BLUE;
+	const int COM = RED;
+	const int PLAYER = BLUE;
 	maxClass max;
 	char *newmap = new char[61];
-	int *redPoint = new int[colRed];
-	int *blPoint = new int[colBlue];
+	int *comPoint = new int[colRed];
+	int *plPoint = new int[colBlue];
 	//int *myKillPoint = new int[colBlue];
-	int r = 0;
-	int b = 0;
+	int com = 0;
+	int pl = 0;
 	for (int i = 0; i < 61; i++)
 	{
-		hexag[i].value = (int)map[i];
-		if (hexag[i].value == RED)
+		hexag[i][0] = (int)map[i];
+		if (hexag[i][0] == COM)
 		{
-			redPoint[r] = hexag[i].id;
-			r++;
+			comPoint[com] = i;
+			com++;
 		}
-		else if (hexag[i].value == BLUE)
+		else if (hexag[i][0] == PLAYER)
 		{
-			blPoint[b] = hexag[i].id;
-			b++;
+			plPoint[pl] = i;
+			pl++;
 		}
 	}
 	
-	max = checkKillPoint(redPoint, colRed);
-	movePoint(max.idWho, max.idWhere);
+	printf("was get:\n");
+	for (int i = 0; i < 61; i++) printf("%i", hexag[i][0]);
+	printf("\n");
+	max = checkKillPoint(comPoint, colRed);
+	printf("post checkKill:\n");
+	for (int i = 0; i < 61; i++) printf("%i",hexag[i][0]);
+	printf("\n");
+	movePoint(max.idFrom, max.idTo);
 	for (int i = 0; i < 61; i++)
 	{
-		newmap[i] = hexag[i].value;
+		newmap[i] = hexag[i][0];
 	}
 	return newmap;
 }
 
-void parsingString(int idHex, char str[35])
+void parsingString(int idNode, char str[35])
 {
 	int i = 0;
 	int c = 0;
-	int id = 0;
+	int idLink = 0;
 	char tmp[3] = "";
-	hexag[idHex].id = idHex;
+	//hexag[idHex].id = idHex;
 	while (str[i] != '\0')
 	{
 		if (str[i] == ',')
 		{
 			tmp[c] = '\0';
-			id = atoi(tmp);
+			idLink = atoi(tmp);
 			strcpy(tmp, "");
 			c = 0;
-			bindNodes(id,idHex);
+			bindNodes(idLink,idNode);
 		}
 
 		if (str[i] != ',')
@@ -148,31 +151,35 @@ int graphCreate()
 	return 0;
 }
 
-int searchRad1(int id, int color)
+int searchRad1(int idNode, int color)
 {
 	int tmp = 0;
-	listNode *tmpList = hexag[id].next;
-	while (tmpList != NULL)
-	{
-		if (tmpList->node->value == color)
-			tmp++;
-		tmpList = tmpList->next;
-	}
 
+	int i = 1;
+	
+	while ((hexag[idNode][i] != -1) && (i<7))
+	{
+		if (hexag[hexag[idNode][i]][0] == color)
+			tmp++;
+		i++;
+	}
 	return tmp;
 }
 
-void reColor(int id, int color)
+void reColor(int idNode, int toColor)
 {
-	listNode *tmpList = hexag[id].next;
-	while (tmpList != NULL)
+	printf("remake in:%i\n", toColor);
+	int i = 1;
+	while ((hexag[idNode][i] != -1) && (i<7))
 	{
-		if ((tmpList->node->value != color) && (tmpList->node->value!=CLEAN))
-		{
-			tmpList->node->value = color;
-		}
-		tmpList = tmpList->next;
+		if ((hexag[hexag[idNode][i]][0] != toColor) && (hexag[hexag[idNode][i]][0] != CLEAN))
+			hexag[hexag[idNode][i]][0] = toColor;
+		i++;
 	}
+
+	printf("post reColor:\n");
+	for (int i = 0; i < 61; i++) printf("%i", hexag[i][0]);
+	printf("\n");
 }
 
 bool visited(int id, int visitMass[])
@@ -184,85 +191,69 @@ bool visited(int id, int visitMass[])
 	return 0;
 }
 
-int movePoint(int who, int where)
+//---movePoint return 1 if all right
+int movePoint(int fromNode, int toNode)
 {
-	int color = hexag[who].value;
-	int rad = 0;
-	int rad2visited[18] = { 0 };
-	bool repeat = true;
-	listNode *tmpList = hexag[who].next;
+	int toColor = hexag[fromNode][0];
+	int i = 1;
 
-	while (tmpList != NULL)
+	while ((hexag[fromNode][i] != -1) && (i<7))
 	{
-		if (!repeat)
+		//visited[hexag[fromNode][i]] = 1;
+		if (hexag[fromNode][i] == toNode)
 		{
-			listNode *tmpList2 = tmpList->node->next;
-			while (tmpList2 != NULL)
+			hexag[toNode][0] = hexag[fromNode][0];
+			printf("pre reColor:\n");
+			for (int i = 0; i < 61; i++) printf("%i", hexag[i][0]);
+			printf("\n");
+			reColor(toNode, toColor);
+			return 1;
+		}
+		i++;
+	}
+
+	while ((hexag[fromNode][i] != -1) && (i<7))
+	{
+		int j = 1;
+		while ((hexag[hexag[fromNode][i]][j] != -1) && (j<7))
+		{
+			if (hexag[hexag[fromNode][i]][j]==toNode)
 			{
-				if (!visited(tmpList2->node->id,rad2visited))
-				if (tmpList2->node->id == where)
-				{
-					rad = 2;
-					break;
-				}
-				tmpList2 = tmpList2->next;
+				hexag[toNode][0] = hexag[fromNode][0];
+				hexag[fromNode][0] = CLEAN;
+				printf("pre reColor:\n");
+				for (int i = 0; i < 61; i++) printf("%i", hexag[i][0]);
+				printf("\n");
+				reColor(toNode, toColor);
+				return 1;
 			}
 		}
-		else if (tmpList->node->id == where)
-		{
-			rad = 1;
-			break;
-		}
-
-		tmpList = tmpList->next;
-		if ((tmpList == NULL) && (repeat))
-		{
-			tmpList = hexag[who].next;
-			repeat = false;
-		}
 	}
 
-	if (rad == 1)
-	{
-		hexag[where].value = color;
-		reColor(where,color);
-	}
-	else if (rad == 2)
-	{
-		hexag[who].value = CLEAN;
-		hexag[where].value = color;
-		reColor(where, color);
-	}
+	printf("post move:\n");
+	for (int i = 0; i < 61; i++) printf("%i",hexag[i][0]);
+	printf("\n");
 	return 0;
 }
 
 void main()
 {
-	graphCreate();
-	
 	for (int i = 0; i < 61; i++)
 	{
-		listNode *tmpList = hexag[i].next;
-		while (tmpList != NULL)
+		for (int j = 0; j < 7; j++)
 		{
-			tmpList = tmpList->next;
+			if (j == 0)hexag[i][j] = 0;
+			else hexag[i][j] = -1;
 		}
-		printf("\n");
 	}
-
-	hexag[6].value = RED;
-	hexag[12].value = RED;
-	hexag[20].value = RED;
-	hexag[22].value = RED;
-	hexag[15].value = BLUE;
+	graphCreate();
 
 	printf("\nSumm = %i\n", searchRad1(13, RED));
-	movePoint(15,13);
+	//movePoint(15,13);
 
-	for (int i = 0; i < 61; i++)
-	{
-		printf("%i:\t%i\n",i,hexag[i].value);
-	}
+	printf("main:\n");
+	for (int i = 0; i < 61; i++) printf("%i",hexag[i][0]);
+	printf("\n");
 
 	serverTCP();
 	printf("\nfinish\n");

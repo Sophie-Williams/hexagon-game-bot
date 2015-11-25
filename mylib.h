@@ -10,28 +10,28 @@
 
 using namespace std;
 
-struct node
+/*struct node
 {
 	int id=-1;
 	int value;
 	bool visited = false;
 	struct listNode *next = NULL;
 };
-
+*/
 class maxClass
 {
 public:
 	int max = 0;
-	int idWho = -1;
-	int idWhere = -1;
+	int idFrom = -1;
+	int idTo = -1;
 };
 
-struct listNode
+/*struct listNode
 {
 	node *node = NULL;
 	listNode *next = NULL;
 };
-
+*/
 void serverTCP();
 char *botStart(char map[], int colRed, int colBlue);
 
