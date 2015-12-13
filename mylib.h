@@ -4,17 +4,20 @@
 #include "stdio.h"
 #include "windows.h"
 #include "fstream"
+#include <vector>
+#include "time.h"
 #pragma comment(lib,"wsock32.lib")
 #pragma warning(disable:4996)			/* for visual studio >=2013 */
 using namespace std;
 
-class maxClass
-{
+class Step {
 public:
-	int max = 0;
-	int idFrom = -1;
-	int idTo = -1;
+	int value;
+	int idTo;
+	int idFrom;
+	int rad;
 };
-void serverTCP();
-char *botStart(char map[], int colRed, int colBlue);
+
+void serverTCP(int**);
+char *botStart(int**, int colRed, int colBlue);
 

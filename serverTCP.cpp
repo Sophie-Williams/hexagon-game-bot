@@ -1,64 +1,50 @@
 #include "mylib.h"
 
-#define PORT 779
-#define PORT2 889
-//char myIPAddres[16];
-void serverTCP()
-{
+#define PORT 889
+void serverTCP(int **hexag) {
 	setlocale(LC_ALL, "RUSSIAN");
 	WSADATA WsaData;
-	SOCKADDR_IN mySockAddr, serverAddr;
-	printf("SocketProg:\n");
-	printf("My addres: ");
-	printf(", ::: %i\n", PORT);
-	
-	SOCKET MySocket;
+	SOCKADDR_IN serverAddr;
+	SOCKET Socket;
+	char msgStr[32] = "You are connected to the PC";
+	char recvBuffer[61];
 
-	if (WSAStartup(0x0101, &WsaData) == SOCKET_ERROR)
-	{
+	printf("Connecting...\n");
+	if (WSAStartup(0x0101, &WsaData) == SOCKET_ERROR) {
 		printf("WSAStartup() failed: %ld\n", GetLastError());
 		getch();
 		return;
 	}
 
-	MySocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(PORT2);
+	serverAddr.sin_port = htons(PORT);
 	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	connect(MySocket, (SOCKADDR *)& serverAddr, sizeof(serverAddr));
-	printf(" %s, ::: %d\n", inet_ntoa(serverAddr.sin_addr), htons(serverAddr.sin_port));
-	char outMessage[61];
-	char msgStr[32] = "You are connected to the PC";
-	char RecvBuffer[61];
-	int recvHex[61];
+	printf("Addres:\n%s :: %d\n", inet_ntoa(serverAddr.sin_addr), htons(serverAddr.sin_port));
+	connect(Socket, (SOCKADDR *)& serverAddr, sizeof(serverAddr));
 
-	send(MySocket, msgStr, strlen(msgStr), MSG_DONTROUTE);
+	send(Socket, msgStr, strlen(msgStr), MSG_DONTROUTE);
 	strcpy(msgStr, "");
-	if (recv(MySocket, msgStr, sizeof(msgStr), 0) != SOCKET_ERROR)
-	{
-		printf("\nserver:::>%s", msgStr);
+	if (recv(Socket, msgStr, sizeof(msgStr), 0) != SOCKET_ERROR) {
+		printf("\nServer: %s", msgStr);
 	}
-	else printf("socket error\n");
-	int hex[61];
-
-	while (recv(MySocket, RecvBuffer, sizeof(RecvBuffer), 0) != SOCKET_ERROR)
-	{
+	else {
+		printf("Socket error\n");
+		getch();
+		return;
+	}
+	while (recv(Socket, recvBuffer, sizeof(recvBuffer), 0) != SOCKET_ERROR) {
 		int colRed = 0;
 		int colBlue = 0;
-		printf("\nserver:::>");
-		for (int i = 0; i < 61; i++)
-		{
-			printf("%i", RecvBuffer[i]);
-			if ((int)RecvBuffer[i] == 1)colRed++;
-			if ((int)RecvBuffer[i] == 2)colBlue++;
+		printf("\nServer:  ");
+		for (int i = 0; i < 61; i++) {
+			printf("%i", recvBuffer[i]);
+			hexag[i][0] = (int)recvBuffer[i];
+			if ((int)recvBuffer[i] == 1)colRed++;
+			if ((int)recvBuffer[i] == 2)colBlue++;
 		}
 		printf("\n");
-		char * str = botStart(RecvBuffer,colRed,colBlue);
-		for (int i = 0; i < 61; i++)
-		{
-			outMessage[i]=(int)str[i];
-		}
-		send(MySocket, outMessage, sizeof(outMessage), MSG_DONTROUTE);
-	} 
+		send(Socket, botStart(hexag, colRed, colBlue), sizeof(char[61]), MSG_DONTROUTE);
+	}
 	WSACleanup();
 }
