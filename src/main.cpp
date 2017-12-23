@@ -1,6 +1,9 @@
 #include <cstring>
 #include "hexagon_bot.h"
-
+#ifdef _WIN32
+    #include "conio.h"
+    #include "windows.h"
+#endif
 
 int main() {
     int port = 889;
