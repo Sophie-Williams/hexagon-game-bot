@@ -9,7 +9,7 @@ When he accepts data of the game card, he looks for the best step for the player
 cd <hexagon-game-bot/>
 mkdir out/
 cd out/
-../cmake
+cmake ../
 make
 ./hexagon-game-bot
 ```
@@ -18,7 +18,7 @@ make
 cd <hexagon-game-bot>
 mkdir out\
 cd out\
-..\cmake
+cmake ..\
 MSBuild hexagon-game-bot.vcxproj
 start Debug\hexagon-game-bot.exe
 ```
